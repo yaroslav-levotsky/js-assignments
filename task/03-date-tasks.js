@@ -22,7 +22,7 @@
  *    'Sun, 17 May 1998 03:00:00 GMT+01' => Date()
  */
 function parseDataFromRfc2822(value) {
-   throw new Error('Not implemented');
+  return new Date(value);
 }
 
 /**
@@ -37,7 +37,7 @@ function parseDataFromRfc2822(value) {
  *    '2016-01-19T08:07:37Z' => Date()
  */
 function parseDataFromIso8601(value) {
-   throw new Error('Not implemented');
+  return new Date(value);
 }
 
 
@@ -56,7 +56,12 @@ function parseDataFromIso8601(value) {
  *    Date(2015,1,1)    => false
  */
 function isLeapYear(date) {
-   throw new Error('Not implemented');
+  const year = date.getFullYear();
+  const yearMultipleOf4 = year % 4 === 0;
+  const yearNotMultipleOf100 = year % 100 !== 0;
+  const yearMultipleOf400 = year % 400 === 0;
+
+  return yearMultipleOf4 && yearNotMultipleOf100 || yearMultipleOf400;
 }
 
 
@@ -76,7 +81,9 @@ function isLeapYear(date) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
 function timeSpanToString(startDate, endDate) {
-   throw new Error('Not implemented');
+  const timespan = new Date(endDate - startDate);
+  const isoTimespan = timespan.toISOString();
+  return isoTimespan.slice(11, -1);
 }
 
 
@@ -94,7 +101,26 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
 function angleBetweenClockHands(date) {
-    throw new Error('Not implemented');
+  const hours = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+
+  const secondsInOneMinute = 60;
+  const hoursRotationSpeed = 0.5;     //  rotation speed of the hours hand (degrees per minute)
+  const minutesRotationSpeed  = 6;        //  rotation speed of the minute hand (degrees per minute)
+  const fullAngle = 360;
+
+  const hoursAngle = secondsInOneMinute * hours + minutes;
+  const minutesAngle = minutesRotationSpeed * minutes;
+
+  const angle = hoursRotationSpeed * hoursAngle - minutesAngle;
+
+  const convexAngle = (angle > 180)
+    ? Math.abs(angle - fullAngle * Math.round(angle / fullAngle))   // bringing an angle to a convex angle
+    : angle;
+
+  const angleInRadians = convexAngle * Math.PI / 180;
+
+  return angleInRadians;
 }
 
 
